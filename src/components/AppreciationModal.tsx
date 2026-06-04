@@ -1,5 +1,6 @@
 import React from 'react';
 import { Heart } from 'lucide-react';
+import qrCodeImage from '/public/assets/IMG_20260605_040328.png';
 
 interface AppreciationModalProps {
   isOpen: boolean;
@@ -87,7 +88,7 @@ export const AppreciationModal: React.FC<AppreciationModalProps> = ({ isOpen, on
           <div className="flex justify-center">
             <div className="relative p-3 bg-white rounded-lg shadow-lg border-2 border-[#d4c09d]">
               <img 
-                src="/assets/IMG_20260605_040328.png" 
+                src={qrCodeImage} 
                 alt="赞赏码" 
                 className="w-48 h-auto rounded"
               />

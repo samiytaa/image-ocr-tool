@@ -40,13 +40,23 @@ echo  Press Ctrl+C to stop the server
 echo ========================================
 echo.
 
-REM Open browser after a short delay (without opening new window)
-powershell -WindowStyle Hidden -Command "Start-Sleep -Seconds 3; Start-Process 'http://localhost:3000'"
+REM Start server in background and wait for it to be ready
+start /B cmd /c "npm run dev"
 
-call npm run dev
+REM Wait for server to be ready (check port 3000)
+echo Waiting for server to start...
+:waitloop
+timeout /t 1 /nobreak >nul
+netstat -ano | findstr ":3000.*LISTENING" >nul 2>&1
+if %errorlevel% neq 0 goto waitloop
 
-REM This will only run if npm run dev exits
 echo.
+echo Server is ready! Opening browser...
+timeout /t 1 /nobreak >nul
+start http://localhost:3000
+
+REM Keep the window open to show logs
 echo.
-echo Server has stopped.
-pause
+echo Server is running. Press Ctrl+C to stop.
+echo.
+pause >nul
