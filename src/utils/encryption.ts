@@ -21,7 +21,7 @@ export const decodeBase64 = (str: string): string => {
 const ENCRYPTED_DEFAULT_CONFIG = {
   endpoint: 'aHR0cHM6Ly9ja2ZmLmRldi92MQ==',
   apiKey: 'c2stV3ZiTkZ1N2ZhQTV2UDZERnhWU2l5S0IxMUF4anBMN21HWFNjUkVZSVA2akdjd0lq',
-  model: 'W2djbGnovYbtIGdlbWluaS0zLjEtZmxhc2gtbGl0ZS1wcmV2aWV3'
+  model: 'Z29vZ2xlL2dlbWluaS0yLjAtZmxhc2gtZXhwOmZyZWU='
 };
 
 // 解密函数
