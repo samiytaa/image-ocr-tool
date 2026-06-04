@@ -1,0 +1,6 @@
+{
+  "name": "图片识别工具",
+  "description": "一个功能强大、设计精美的图片文字识别(OCR)及结构化表格导出工具",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
