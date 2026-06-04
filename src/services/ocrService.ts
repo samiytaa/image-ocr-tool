@@ -1,5 +1,34 @@
 import { ApiConfig, OcrFormData, OcrResult } from '../types';
 
+// Retry helper function
+const fetchWithRetry = async (
+  url: string, 
+  options: RequestInit, 
+  maxRetries: number = 2,
+  retryDelay: number = 1000
+): Promise<Response> => {
+  for (let i = 0; i <= maxRetries; i++) {
+    try {
+      const response = await fetch(url, options);
+      
+      // If 503, retry; otherwise return response
+      if (response.status !== 503 || i === maxRetries) {
+        return response;
+      }
+      
+      console.log(`服务暂时不可用 (503)，${retryDelay}ms 后重试... (${i + 1}/${maxRetries})`);
+      await new Promise(resolve => setTimeout(resolve, retryDelay));
+      retryDelay *= 2; // Exponential backoff
+    } catch (error) {
+      if (i === maxRetries) throw error;
+      console.log(`请求失败，${retryDelay}ms 后重试... (${i + 1}/${maxRetries})`);
+      await new Promise(resolve => setTimeout(resolve, retryDelay));
+      retryDelay *= 2;
+    }
+  }
+  throw new Error('Max retries exceeded');
+};
+
 // Perform multi-modal OCR based on API settings
 export const performOcrOnBase64 = async (
   base64Image: string,
@@ -25,7 +54,7 @@ export const performOcrOnBase64 = async (
     const cleanEndpoint = apiConfig.endpoint.replace(/\/$/, '');
     const chatUrl = `${cleanEndpoint}/chat/completions`;
 
-    const response = await fetch(chatUrl, {
+    const response = await fetchWithRetry(chatUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -53,7 +82,11 @@ export const performOcrOnBase64 = async (
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+      const errorText = await response.text().catch(() => 'Unknown error');
+      if (response.status === 503) {
+        throw new Error(`服务暂时不可用 (503)，请稍后重试。可能原因：\n1. API服务器正在维护\n2. 请求过多，服务器过载\n3. 网络连接问题\n\n详细信息: ${errorText}`);
+      }
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
 
     const responseData = await response.json();
@@ -95,6 +128,20 @@ export const performOcrOnBase64 = async (
     };
   } catch (err) {
     console.error('OCR Error:', err);
+    
+    // 提供更详细的错误信息
+    if (err instanceof Error) {
+      if (err.message.includes('503')) {
+        console.error('提取 加载失败: API 服务暂时不可用，请稍后重试');
+      } else if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+        console.error('提取 加载失败: 网络连接失败，请检查网络连接');
+      } else if (err.message.includes('401') || err.message.includes('403')) {
+        console.error('提取 加载失败: API 密钥无效或权限不足');
+      } else {
+        console.error(`提取 加载失败: ${err.message}`);
+      }
+    }
+    
     return null;
   }
 };

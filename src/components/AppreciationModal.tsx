@@ -28,7 +28,7 @@ export const AppreciationModal: React.FC<AppreciationModalProps> = ({ isOpen, on
             <div className="flex items-center gap-2">
               <Heart className="w-5 h-5 text-[#fbfaf5] fill-[#fbfaf5] animate-pulse" />
               <h3 className="font-heading font-black text-[#fbfaf5] text-lg tracking-wide">
-                🎭 军师求援奏章
+                恭喜主公可以称帝了！
               </h3>
             </div>
             <button
