@@ -40,6 +40,9 @@ echo  Press Ctrl+C to stop the server
 echo ========================================
 echo.
 
+REM Open browser after a short delay (without opening new window)
+powershell -WindowStyle Hidden -Command "Start-Sleep -Seconds 3; Start-Process 'http://localhost:3000'"
+
 call npm run dev
 
 REM This will only run if npm run dev exits
