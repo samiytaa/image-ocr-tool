@@ -144,8 +144,8 @@ export default function App() {
     incrementUsageCount();
   };
 
-  const handleBatchProcessWithCount = async () => {
-    await handleBatchProcess();
+  const handleBatchProcessWithCount = async (files: File[]) => {
+    await handleBatchProcess(files);
     incrementUsageCount();
   };
 
