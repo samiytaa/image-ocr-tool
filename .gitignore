@@ -7,3 +7,22 @@ coverage/
 .env*
 !.env.example
 .kiro/
+
+# Vite
+.vite/
+*.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~

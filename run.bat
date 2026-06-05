@@ -29,31 +29,45 @@ if not exist "node_modules\" (
     echo.
 )
 
+REM Check if port 3000 is already in use
+echo Checking port availability...
+netstat -ano | findstr ":3000.*LISTENING" >nul 2>&1
+if %errorlevel% equ 0 (
+    color 0E
+    echo.
+    echo WARNING: Port 3000 is already in use!
+    echo Attempting to use port 3001 instead...
+    echo.
+    set PORT=3001
+) else (
+    set PORT=3000
+)
+
 REM Start the development server
 echo [Step 2/2] Starting development server...
 echo.
 echo ========================================
 echo  Server will start at: 
-echo  http://localhost:3000
+echo  http://localhost:%PORT%
 echo.
 echo  Press Ctrl+C to stop the server
 echo ========================================
 echo.
 
-REM Start server in background and wait for it to be ready
-start /B cmd /c "npm run dev"
+REM Start server with specified port
+start /B cmd /c "npx vite --port=%PORT% --host=0.0.0.0"
 
-REM Wait for server to be ready (check port 3000)
+REM Wait for server to be ready
 echo Waiting for server to start...
 :waitloop
 timeout /t 1 /nobreak >nul
-netstat -ano | findstr ":3000.*LISTENING" >nul 2>&1
+netstat -ano | findstr ":%PORT%.*LISTENING" >nul 2>&1
 if %errorlevel% neq 0 goto waitloop
 
 echo.
 echo Server is ready! Opening browser...
 timeout /t 1 /nobreak >nul
-start http://localhost:3000
+start http://localhost:%PORT%
 
 REM Keep the window open to show logs
 echo.

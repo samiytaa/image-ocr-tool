@@ -59,7 +59,50 @@ export const useOcrProcessing = ({
       if (result) {
         setFormData(result);
         setRawOcrText('识别成功');
-        showToast('识别成功并已自动填充');
+        
+        // 自动暂存识别结果
+        const getCurrentPrefix = (name: string) => {
+          const parts = name.split('·');
+          return parts.length > 1 ? parts[0] : name;
+        };
+
+        const currentPrefix = getCurrentPrefix(result.name1 || result.name2 || result.name3);
+        
+        setSavedItems(prev => {
+          const existingIndex = prev.findIndex(item => {
+            const itemPrefix = getCurrentPrefix(item.formData.name1 || item.formData.name2 || item.formData.name3);
+            return itemPrefix === currentPrefix;
+          });
+
+          let updated: SavedOcrItem[];
+          let message: string;
+          
+          if (existingIndex !== -1) {
+            updated = prev.map((item, index) => {
+              if (index === existingIndex) {
+                return {
+                  ...item,
+                  formData: { ...result },
+                  timestamp: Date.now()
+                };
+              }
+              return item;
+            });
+            message = `识别成功并已自动暂存（已覆盖重名家具"${currentPrefix}"的条目）`;
+          } else {
+            const newItem: SavedOcrItem = {
+              id: Date.now().toString(),
+              formData: { ...result },
+              timestamp: Date.now()
+            };
+            updated = [...prev, newItem];
+            message = '识别成功并已自动暂存';
+          }
+          
+          localStorage.setItem('savedOcrItems', JSON.stringify(updated));
+          showToast(message);
+          return updated;
+        });
       } else {
         setRawOcrText('识别失败: 无法解析结果');
         showToast('识别失败 (未能成功自动填充属性, 请手动核对)');
