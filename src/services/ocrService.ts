@@ -116,6 +116,21 @@ export const performOcrOnBase64 = async (
     const n2 = suf2 ? (prefix ? `${prefix}·${suf2}` : `${parsed.name}·${suf2}`) : `${parsed.name}2`;
     const n3 = suf3 ? (prefix ? `${prefix}·${suf3}` : `${parsed.name}·${suf3}`) : `${parsed.name}3`;
 
+    // 提取获取方式的前缀（例如：【起居】、【左慈】等）
+    let obtainPrefix = '';
+    const obtainMatch = (parsed.obtain || '').match(/【([^】]+)】/);
+    if (obtainMatch) {
+      obtainPrefix = obtainMatch[0]; // 保留【】符号
+    }
+
+    // 判断是否包含"家具打造"
+    const isJiajuDazao = (parsed.obtain || '').includes('家具打造');
+    
+    // 设置三条数据的获取方式
+    const obtain1 = obtainPrefix ? `${obtainPrefix}家具打造` : parsed.obtain || '';
+    const obtain2 = obtainPrefix ? `${obtainPrefix}家具染色` : parsed.obtain || '';
+    const obtain3 = obtainPrefix ? `${obtainPrefix}家具染色` : parsed.obtain || '';
+
     return {
       name1: n1,
       name2: n2,
@@ -123,6 +138,9 @@ export const performOcrOnBase64 = async (
       usage: parsed.usage || '',
       description: parsed.description || '',
       obtain: parsed.obtain || '',
+      obtain1: obtain1,
+      obtain2: obtain2,
+      obtain3: obtain3,
       quality: parsed.quality || '',
       gridSize: parsed.gridSize || ''
     };

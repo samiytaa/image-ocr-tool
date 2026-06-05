@@ -19,16 +19,16 @@ export default function ExportCard({ formData, savedItems = [], showSuccessToast
       const rows: string[][] = [];
       savedItems.forEach(item => {
         const fd = item.formData;
-        rows.push([fd.name1 || '', fd.usage || '', fd.description || '', fd.obtain || '', fd.gridSize || '', fd.quality || '']);
-        rows.push([fd.name2 || '', fd.usage || '', fd.description || '', fd.obtain || '', fd.gridSize || '', fd.quality || '']);
-        rows.push([fd.name3 || '', fd.usage || '', fd.description || '', fd.obtain || '', fd.gridSize || '', fd.quality || '']);
+        rows.push([fd.name1 || '', fd.usage || '', fd.description || '', fd.obtain1 || fd.obtain || '', fd.gridSize || '', fd.quality || '']);
+        rows.push([fd.name2 || '', fd.usage || '', fd.description || '', fd.obtain2 || fd.obtain || '', fd.gridSize || '', fd.quality || '']);
+        rows.push([fd.name3 || '', fd.usage || '', fd.description || '', fd.obtain3 || fd.obtain || '', fd.gridSize || '', fd.quality || '']);
       });
       return rows;
     }
     return [
-      [formData.name1 || '', formData.usage || '', formData.description || '', formData.obtain || '', formData.gridSize || '', formData.quality || ''],
-      [formData.name2 || '', formData.usage || '', formData.description || '', formData.obtain || '', formData.gridSize || '', formData.quality || ''],
-      [formData.name3 || '', formData.usage || '', formData.description || '', formData.obtain || '', formData.gridSize || '', formData.quality || '']
+      [formData.name1 || '', formData.usage || '', formData.description || '', formData.obtain1 || formData.obtain || '', formData.gridSize || '', formData.quality || ''],
+      [formData.name2 || '', formData.usage || '', formData.description || '', formData.obtain2 || formData.obtain || '', formData.gridSize || '', formData.quality || ''],
+      [formData.name3 || '', formData.usage || '', formData.description || '', formData.obtain3 || formData.obtain || '', formData.gridSize || '', formData.quality || '']
     ];
   };
 

@@ -48,6 +48,9 @@ export const useSavedItemsHandlers = ({
       usage: '',
       description: '',
       obtain: '',
+      obtain1: '',
+      obtain2: '',
+      obtain3: '',
       quality: '',
       gridSize: ''
     });
@@ -64,6 +67,9 @@ export const useSavedItemsHandlers = ({
       usage: '',
       description: '',
       obtain: '',
+      obtain1: '',
+      obtain2: '',
+      obtain3: '',
       quality: '',
       gridSize: ''
     });

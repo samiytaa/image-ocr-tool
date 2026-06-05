@@ -11,6 +11,9 @@ export const useOcrData = () => {
     usage: '',
     description: '',
     obtain: '',
+    obtain1: '',
+    obtain2: '',
+    obtain3: '',
     quality: '',
     gridSize: ''
   });
@@ -23,6 +26,9 @@ export const useOcrData = () => {
       usage: '',
       description: '',
       obtain: '',
+      obtain1: '',
+      obtain2: '',
+      obtain3: '',
       quality: '',
       gridSize: ''
     });

@@ -29,6 +29,9 @@ export interface OcrFormData {
   usage: string;
   description: string;
   obtain: string;
+  obtain1: string;
+  obtain2: string;
+  obtain3: string;
   quality: string;
   gridSize: string;
 }
