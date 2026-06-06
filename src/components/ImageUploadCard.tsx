@@ -148,10 +148,10 @@ export default function ImageUploadCard({
     // 合并现有文件和新文件
     const combinedFiles = [...batchFiles, ...files];
     
-    // 限制最多15张
-    if (combinedFiles.length > 15) {
-      alert(`最多只能上传15张图片，当前已有${batchFiles.length}张，最多还能添加${15 - batchFiles.length}张`);
-      const allowedFiles = files.slice(0, 15 - batchFiles.length);
+    // 限制最多60张
+    if (combinedFiles.length > 60) {
+      alert(`最多只能上传60张图片，当前已有${batchFiles.length}张，最多还能添加${60 - batchFiles.length}张`);
+      const allowedFiles = files.slice(0, 60 - batchFiles.length);
       if (allowedFiles.length > 0) {
         onBatchFilesChange([...batchFiles, ...allowedFiles]);
       }
@@ -309,7 +309,7 @@ export default function ImageUploadCard({
               </div>
               
               {/* 追加图片按钮 */}
-              {batchFiles.length < 15 && (
+              {batchFiles.length < 60 && (
                 <div className="flex justify-center">
                   <button
                     type="button"
@@ -320,16 +320,16 @@ export default function ImageUploadCard({
                     className="flex items-center gap-2 px-4 py-2 bg-[#f4ebd0] hover:bg-[#ebdcae] border-2 border-dashed border-[#9e2a2b]/50 hover:border-[#9e2a2b] rounded-lg text-sm font-bold text-stone-700 transition-all"
                   >
                     <Upload className="w-4 h-4 text-[#9e2a2b]" />
-                    继续添加图片 ({batchFiles.length}/15)
+                    继续添加图片 ({batchFiles.length}/60)
                   </button>
                 </div>
               )}
               
               {/* 达到上限提示 */}
-              {batchFiles.length >= 15 && (
+              {batchFiles.length >= 60 && (
                 <div className="flex justify-center">
                   <div className="px-4 py-2 bg-amber-50 border border-amber-200 rounded-lg text-xs font-bold text-amber-700">
-                    已达到上限 (15/15)
+                    已达到上限 (60/60)
                   </div>
                 </div>
               )}
@@ -353,7 +353,7 @@ export default function ImageUploadCard({
                 <p className="text-[11px] text-stone-400 font-medium">
                   {processingMode === 'single'
                     ? '支持 PNG, JPG, JPEG, WEBP 格式 | 可使用 Ctrl+V 粘贴'
-                    : '批量模式：最多可上传15张图片 | 将依次处理所有图片并自动存入暂存列表'}
+                    : '批量模式：最多可上传60张图片 | 将分批处理所有图片并自动存入暂存列表'}
                 </p>
               </div>
             </div>
