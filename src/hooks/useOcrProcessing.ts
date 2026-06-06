@@ -1,5 +1,5 @@
 import { ApiConfig, OcrFormData, SavedOcrItem } from '../types';
-import { performOcrOnBase64 } from '../services/ocrService';
+import { performOcrOnBase64, performBatchOcrOnBase64 } from '../services/ocrService';
 import { getBase64FromImageUrl, getBase64FromFile } from '../utils/imageUtils';
 
 interface UseOcrProcessingProps {
@@ -116,7 +116,7 @@ export const useOcrProcessing = ({
     }
   };
 
-  // 批量处理图片
+  // 批量处理图片（一次性API调用）
   const handleBatchProcess = async (files: File[]) => {
     if (!apiConfig.apiKey || !apiConfig.endpoint || !apiConfig.model) {
       setIsApiModalOpen(true);
@@ -126,17 +126,50 @@ export const useOcrProcessing = ({
 
     startBatch(files.length);
     setOcrLoading(true);
+    updateProgress(0, '正在转换所有图片为Base64格式...');
 
-    let successCount = 0;
-    let failCount = 0;
+    try {
+      // 第一步：将所有图片转换为Base64
+      const base64Images: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        updateProgress(i + 1, `正在准备: ${file.name}`);
+        try {
+          const base64Image = await getBase64FromFile(file);
+          base64Images.push(base64Image);
+        } catch (err) {
+          console.error(`转换图片 ${file.name} 失败:`, err);
+          base64Images.push(''); // 占位，保持索引对应
+        }
+      }
 
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      updateProgress(i + 1, file.name);
+      // 第二步：一次性调用API处理所有图片
+      updateProgress(files.length, '正在批量识别所有图片...');
+      const results = await performBatchOcrOnBase64(
+        base64Images.filter(img => img !== ''), // 过滤掉转换失败的
+        apiConfig,
+        option1,
+        option2,
+        option3
+      );
 
-      try {
-        const base64Image = await getBase64FromFile(file);
-        const result = await performOcrOnBase64(base64Image, apiConfig, option1, option2, option3);
+      // 第三步：保存识别结果
+      let successCount = 0;
+      let failCount = 0;
+      
+      let resultIndex = 0;
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        
+        // 如果该图片转换失败，跳过
+        if (base64Images[i] === '') {
+          failCount++;
+          incrementFail();
+          continue;
+        }
+        
+        const result = results[resultIndex];
+        resultIndex++;
         
         if (result) {
           const newItem: SavedOcrItem = {
@@ -144,34 +177,38 @@ export const useOcrProcessing = ({
             formData: result,
             timestamp: Date.now()
           };
+          
           setSavedItems(prev => {
             const updated = [...prev, newItem];
             localStorage.setItem('savedOcrItems', JSON.stringify(updated));
             return updated;
           });
+          
           successCount++;
           incrementSuccess();
         } else {
           failCount++;
           incrementFail();
         }
+      }
 
-        // 添加延迟避免请求过快
-        if (i < files.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-      } catch (err) {
-        console.error(`处理图片 ${file.name} 失败:`, err);
-        failCount++;
+      setOcrLoading(false);
+      completeBatch();
+      setBatchFiles([]);
+      
+      showToast(`批量处理完成！成功: ${successCount} 张，失败: ${failCount} 张`);
+    } catch (err) {
+      console.error('批量处理失败:', err);
+      setOcrLoading(false);
+      completeBatch();
+      
+      // 全部标记为失败
+      for (let i = 0; i < files.length; i++) {
         incrementFail();
       }
+      
+      showToast(`批量处理失败: ${err instanceof Error ? err.message : '未知错误'}`);
     }
-
-    setOcrLoading(false);
-    completeBatch();
-    setBatchFiles([]);
-    
-    showToast(`批量处理完成！成功: ${successCount} 张，失败: ${failCount} 张`);
   };
 
   return {
