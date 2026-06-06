@@ -150,10 +150,21 @@ export const useOcrProcessing = ({
         throw new Error('所有图片转换失败');
       }
 
-      // 第二步：分批处理
+      // 第二步：分批处理（均摊策略）
+      const totalImages = base64Images.length;
       const batches: { file: File; base64: string; index: number }[][] = [];
-      for (let i = 0; i < base64Images.length; i += BATCH_SIZE) {
-        batches.push(base64Images.slice(i, i + BATCH_SIZE));
+      
+      if (totalImages <= BATCH_SIZE) {
+        // 图片数≤10，单批次处理
+        batches.push(base64Images);
+      } else {
+        // 图片数>10，计算最优批次数和每批数量
+        const batchCount = Math.ceil(totalImages / BATCH_SIZE);
+        const imagesPerBatch = Math.ceil(totalImages / batchCount);
+        
+        for (let i = 0; i < totalImages; i += imagesPerBatch) {
+          batches.push(base64Images.slice(i, i + imagesPerBatch));
+        }
       }
 
       updateProgress(files.length, `准备完成，共 ${batches.length} 个批次，开始识别...`);
