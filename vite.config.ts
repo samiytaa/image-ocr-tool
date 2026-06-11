@@ -5,7 +5,7 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
-    base: '/',
+    base: process.env.NODE_ENV === 'production' ? '/image-ocr-tool/' : '/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
